@@ -16,13 +16,14 @@ The main vulnerability is a **Remote Code Execution (RCE)** flaw caused by an in
 dangerous_template_render()
 dangerous_exec()
 shell_exec()
+```
 
 User-controlled template expressions inside {{ ... }} are executed directly on the server:
 ```{{ id }}```
 This becomes:
 ```
 shell_exec("id");
-
+```
 
 # Features of This Lab
 
@@ -76,3 +77,5 @@ GET /api/render.php?page=../../../../etc/passwd
 python3 exp.py lfi /etc/passwd
 python3 exp.py rce "id"
 ```
+### POC
+<img width="1048" height="541" alt="example" src="https://github.com/user-attachments/assets/4f245f97-70dd-45e8-b0c6-c7b81b2db2e7" />
