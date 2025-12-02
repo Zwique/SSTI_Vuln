@@ -22,7 +22,7 @@ User-controlled template expressions inside {{ ... }} are executed directly on t
 This becomes:
 ```
 shell_exec("id");
-```
+
 
 # Features of This Lab
 
@@ -81,7 +81,7 @@ docker-compose build
 docker-compose up
 
 
-Access at:
+## Access at:
 
 http://localhost:8080/
 
