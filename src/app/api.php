@@ -7,46 +7,88 @@ $action = $_GET['action'] ?? '';
 
 switch ($action) {
 
-case "login":
-    $u = $_POST['username'] ?? '';
-    $p = $_POST['password'] ?? '';
+    /* ================= LOGIN (SQLi) ================= */
 
-    // ❌ INTENTIONAL SQL INJECTION
-    $sql = "SELECT username FROM users WHERE username='$u' AND password='$p'";
-    $res = $db->query($sql);
+    case "login":
+        $u = $_POST['username'] ?? '';
+        $p = $_POST['password'] ?? '';
 
-    if ($res && $res->num_rows > 0) {
-        $row = $res->fetch_assoc();
-        $_SESSION['user'] = $row['username'];
-        header("Location: dashboard.php");
+        // ❌ INTENTIONAL SQL INJECTION
+        $sql = "SELECT username FROM users WHERE username='$u' AND password='$p'";
+        $res = $db->query($sql);
+
+        if ($res && $res->num_rows > 0) {
+            $row = $res->fetch_assoc();
+            $_SESSION['user'] = $row['username'];
+            header("Location: dashboard.php");
+            exit;
+        } else {
+            echo "Invalid.";
+            exit;
+        }
+
+    /* ================= LOGOUT ================= */
+
+    case "logout":
+        session_destroy();
+        header("Location: index.php");
         exit;
-    } else {
-        echo "Invalid.";
-    }
-    break;
 
-case "load_note_to_template":
-    if (!isset($_SESSION['user'])) die("auth required");
+    /* ================= SQLi → FILE WRITE ================= */
 
-    $title = $_GET['title'] ?? '';
-    $res = $db->query("SELECT content FROM notes WHERE title = '$title'");
+    case "load_note_to_template":
+        if (!isset($_SESSION['user'])) die("auth required");
 
-    if ($res && $row = $res->fetch_assoc()) {
-        file_put_contents("/tmp/template_" . session_id(), $row['content']);
-        echo "template loaded";
-    } else {
-        echo "no note";
-    }
-    break;
+        $title = $_GET['title'] ?? '';
 
-case "preview":
-    if (!isset($_SESSION['user'])) die("auth required");
+        // ❌ INTENTIONAL SQL INJECTION
+        $sql = "SELECT content FROM notes WHERE title = '$title'";
+        $res = $db->query($sql);
 
-    echo dangerous_template_render(
-        file_get_contents("/tmp/template_" . session_id())
-    );
-    break;
+        if ($res && $row = $res->fetch_assoc()) {
+            file_put_contents(
+                "/tmp/template_" . session_id(),
+                $row['content']
+            );
+            echo "template loaded";
+        } else {
+            echo "no note";
+        }
+        exit;
 
-default:
-    echo "unknown action";
+    /* ================= MANUAL TEMPLATE SAVE ================= */
+
+    case "render_template":
+        if (!isset($_SESSION['user'])) die("auth required");
+
+        $tpl = $_POST['template'] ?? '';
+        file_put_contents(
+            "/tmp/template_" . session_id(),
+            $tpl
+        );
+        echo "template saved";
+        exit;
+
+    /* ================= SSTI → RCE ================= */
+
+    case "preview":
+        if (!isset($_SESSION['user'])) die("auth required");
+
+        $path = "/tmp/template_" . session_id();
+        if (!file_exists($path)) die("no template");
+
+        echo dangerous_template_render(
+            file_get_contents($path)
+        );
+        exit;
+
+    /* ================= MISC ================= */
+
+    case "ping":
+        echo "pong";
+        exit;
+
+    default:
+        echo "unknown action";
+        exit;
 }
