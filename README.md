@@ -1,7 +1,6 @@
-# CVE‑2025‑1337 — Intentional Remote Code Execution Training Machine
+# Intentional Remote Code Execution Training Machine SSTI
 
 This project provides a deliberately vulnerable environment designed for security research, exploit development practice, and CTF‑style challenges.  
-It does not replicate the real vendor product behind the official CVE‑2025‑1337.  
 Instead, it demonstrates a similar severity class vulnerability using a custom, insecure PHP backend.
 
 ---
