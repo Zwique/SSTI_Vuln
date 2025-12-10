@@ -7,49 +7,46 @@ $action = $_GET['action'] ?? '';
 
 switch ($action) {
 
-    case "login":
-        $u = $_POST['username'];
-        $p = $_POST['password'];
+case "login":
+    $u = $_POST['username'] ?? '';
+    $p = $_POST['password'] ?? '';
 
-        $stmt = $db->prepare("SELECT username FROM users WHERE username=? AND password=?");
-        $stmt->bind_param("ss", $u, $p);
-        $stmt->execute();
-        $stmt->store_result();
+    // ❌ INTENTIONAL SQL INJECTION
+    $sql = "SELECT username FROM users WHERE username='$u' AND password='$p'";
+    $res = $db->query($sql);
 
-        if ($stmt->num_rows > 0) {
-            $_SESSION['user'] = $u;
-            header("Location: dashboard.php");
-        } else {
-            echo "Invalid.";
-        }
-        break;
+    if ($res && $res->num_rows > 0) {
+        $row = $res->fetch_assoc();
+        $_SESSION['user'] = $row['username'];
+        header("Location: dashboard.php");
+        exit;
+    } else {
+        echo "Invalid.";
+    }
+    break;
 
-    case "logout":
-        session_destroy();
-        header("Location: index.php");
-        break;
+case "load_note_to_template":
+    if (!isset($_SESSION['user'])) die("auth required");
 
-    case "upload":
-        $name = $_FILES['upload']['name'];
-        $tmp  = $_FILES['upload']['tmp_name'];
+    $title = $_GET['title'] ?? '';
+    $res = $db->query("SELECT content FROM notes WHERE title = '$title'");
 
-        move_uploaded_file($tmp, "uploads/" . $name);
-        echo "Uploaded.";
-        break;
+    if ($res && $row = $res->fetch_assoc()) {
+        file_put_contents("/tmp/template_" . session_id(), $row['content']);
+        echo "template loaded";
+    } else {
+        echo "no note";
+    }
+    break;
 
-    case "status":
-        echo json_encode(["status"=>"ok","version"=>"1.0"]);
-        break;
+case "preview":
+    if (!isset($_SESSION['user'])) die("auth required");
 
-    case "ping":
-        echo "pong";
-        break;
+    echo dangerous_template_render(
+        file_get_contents("/tmp/template_" . session_id())
+    );
+    break;
 
-    case "render_template":
-        $tpl = $_POST['template'] ?? '';
-        echo dangerous_template_render($tpl); // calls RCE!
-        break;
-
-    default:
-        echo "unknown action";
+default:
+    echo "unknown action";
 }

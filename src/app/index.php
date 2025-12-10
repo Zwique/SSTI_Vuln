@@ -9,16 +9,13 @@ if (isset($_SESSION['user'])) {
 ?>
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Vuln Lab</title>
-</head>
+<head><title>Vuln Lab</title></head>
 <body>
-    <h1>Welcome to Vuln Lab by Zwique</h1>
-
-    <form method="POST" action="api.php?action=login">
-        <input type="text" name="username" placeholder="username"><br>
-        <input type="password" name="password" placeholder="password"><br>
-        <button type="submit">Log in</button>
-    </form>
+<h1>Welcome</h1>
+<form method="POST" action="api.php?action=login">
+    <input name="username" placeholder="username"><br>
+    <input type="password" name="password" placeholder="password"><br>
+    <button>Login</button>
+</form>
 </body>
 </html>

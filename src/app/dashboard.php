@@ -10,28 +10,22 @@ if (!isset($_SESSION['user'])) {
 ?>
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Dashboard</title>
-</head>
+<head><title>Dashboard</title></head>
 <body>
-<h2>Hello, <?php echo $_SESSION['user']; ?></h2>
 
-<a href="api.php?action=logout">Log out</a>
+<h2>Hello <?php echo $_SESSION['user']; ?></h2>
+<a href="api.php?action=logout">Logout</a>
 
-<h3>Upload File</h3>
-<form action="api.php?action=upload" method="POST" enctype="multipart/form-data">
-    <input type="file" name="upload">
-    <button>Upload</button>
-</form>
-
-<h3>Template Preview</h3>
+<h3>Save Template</h3>
 <form method="POST" action="api.php?action=render_template">
 <textarea name="template" rows="6" cols="60">
-Hello {{system('id')}}
-</textarea>
-<br>
-<button>Render</button>
+Hello {{ id }}
+</textarea><br>
+<button>Save</button>
 </form>
+
+<h3>Preview</h3>
+<a href="api.php?action=preview">Render Template</a>
 
 </body>
 </html>
