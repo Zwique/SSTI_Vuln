@@ -88,3 +88,6 @@ Example usage:
 python3 exploit/exp.py "id"
 python3 exploit/exp.py "ls -la"
 ```
+
+> [!NOTE]
+> After gaining `www-data`, there is a privilege escalation vulnerability. Escalate to the `root` user and retrieve `flag.txt` from the /root directory.
