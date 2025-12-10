@@ -1,80 +1,90 @@
-# Intentional Remote Code Execution Training Machine SSTI
+# 🧪 Intentionally Vulnerable Web Lab (Beginner Friendly)
 
-This project provides a deliberately vulnerable environment designed for security research, exploit development practice, and CTF‑style challenges.  
-Instead, it demonstrates a similar severity class vulnerability using a custom, insecure PHP backend.
+This project is a **deliberately vulnerable PHP web application** created for **beginners** to learn web exploitation in a **safe, local environment**.
+
+It is ideal for:
+- ✅ Web security beginners  
+- ✅ CTF-style practice  
+- ✅ Learning how vulnerabilities chain together in real applications  
+
+> ⚠️ **WARNING**  
+> This application is intentionally insecure.  
+> **Never deploy it on the internet or in a production environment.**
 
 ---
 
-## Vulnerability Summary
+## 🎯 Learning Goal
 
-The main vulnerability is a **Remote Code Execution (RCE)** flaw caused by an intentionally unsafe template engine.
+Learn how small security bugs can escalate into critical impact by chaining vulnerabilities:
 
-### Vulnerable Functions
+
+---
+
+## 🛠️ Tech Stack
+
+- PHP 7.4
+- MariaDB 10.6
+- Docker & Docker Compose
+- Simple HTML / JavaScript frontend
+
+---
+
+## 🔥 Vulnerabilities Included
+
+### ✅ SQL Injection (Beginner Friendly)
+
+User input is directly embedded into SQL queries without sanitization:
 
 ```php
-dangerous_template_render()
-dangerous_exec()
-shell_exec()
+SELECT content FROM notes WHERE title = '$title'
 ```
 
-User-controlled template expressions inside {{ ... }} are executed directly on the server:
-```{{ id }}```
-This becomes:
+This allows SQL injection, for example:
 ```
-shell_exec("id");
+' UNION SELECT '{{whoami}}' --
 ```
 
-# Features of This Lab
+The injected value is later processed by the template engine, leading to further exploitation.
 
-- PHP 7.4 backend with intentionally insecure code
 
-- Custom template engine supporting full RCE
+This version:
+- ✅ Fixes formatting
+- ✅ Clearly explains **why** the payload matters
+- ✅ Keeps it beginner-friendly
+- ✅ Prepares readers for the SSTI → RCE step
 
-- LFI vulnerability in `render.php?page=`
+---
 
-- Weak login system
+## 🚀 Running the Lab (Docker)
 
-- Unsafe file upload endpoint
+This lab is fully Dockerized and runs locally.
 
-- Supports:
+### Build and Start
 
-    - Local File Inclusion (LFI)
+From the project root, run:
 
-    - Remote Code Execution (RCE)
-
-- Simple HTML/JS frontend
-
-- Dockerized for easy deployment
-- 
-> [!NOTE]
-> PHP 7.4 backend with intentionally insecure code
-
-🚀 Running the Machine
-
-Build and start:
-
-```docker-compose build
+```bash
+docker-compose build
 docker-compose up
 ```
+The application will be available at:
+```
+http://localhost:8080
+```
+To Stop the lab:
 
+```
+docker-compose down
+```
 
-## Access at:
+🧨 Exploit Script
 
-http://localhost:8080/
-
-🧪 Exploitation Examples
-RCE (Template Injection)
-```POST /api/render.php
-page={{ id }}
+A ready‑to‑use exploit script is provided for learning purposes:
 ```
-LFI (Read System Files)
+/exploit/exp.py
 ```
-GET /api/render.php?page=../../../../etc/passwd
+Example usage:
 ```
-### Using the Provided PoC Script
+python3 exploit/exp.py "id"
+python3 exploit/exp.py "ls -la"
 ```
-python3 exp.py lfi /etc/passwd
-python3 exp.py rce "id"
-```
-### PoC
-<img width="1048" height="541" alt="example" src="https://github.com/user-attachments/assets/4f245f97-70dd-45e8-b0c6-c7b81b2db2e7" />
